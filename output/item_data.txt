@@ -1,0 +1,6 @@
+Item ID   Description         Selling Price(Rs.)  Purchase Price(Rs.) Quantity            Profit(Rs.)         
+1         PEN                 40                  30                  20                  10                  
+2         PENCIL              30                  20                  50                  10                  
+3         BOOK                620                 450                 40                  170                 
+4         ART                 45                  30                  50                  15                  
+5         DIMY                30                  20                  40                  10                  

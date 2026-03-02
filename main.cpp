@@ -1,302 +1,76 @@
 #include <iostream>
-
 #include <fstream>
-
 #include <string>
-
 #include <ctime>
-
 #include <vector>
-
 #include <iomanip>
-
 #include <windows.h>
+#include <sstream>
 
 using namespace std;
 
-void dashboard();
-void menu();
-void inventory_Report();
-
-void owner()
-{
-    int number;
-    cout << "\n------------------------Minsara Book Shop------------------------" << endl << endl;
-    cout << "1. Inventory Management" << endl;
-    cout << "2. Exit" << endl;
-    cout << "\n-----------------------------------------------------------------" << endl << endl;
-    cout << "Enter the number you want log: ";
-    cin >> number;
-    switch (number)
-    {
-    case 1:
-        cout << "-------------------------Sales Report-------------------------" << endl << endl;
-        inventory_Report();
-        break;
-
-    case 2:
-        break;
-    }
-}
-
-void cashier()
-{
-    int invo_num;
-    string user_name;
-    cout << "                            INVOICE                              \n" << endl;
-    cout << "------------------------Minsara Book Shop------------------------\n" << endl;
-    cout << "                       #134, Colombo Road                        " << endl;
-    cout << "                            Negombo                              " << endl;
-    cout << "                         Tel: 0317362833                         " << endl;
-    time_t tt;
-    struct tm * ti;
-    time(&tt);
-    ti = localtime(&tt);
-    cout << "Date and Time: \t" << asctime(ti) << endl;
-    cout << "Invoice No: ";
-    cin >> invo_num;
-    cout << "User: ";
-    cin >> user_name;
-    cout << endl << endl;
-
-    ifstream inventoryFile("item_data.txt");
-
-    if (!inventoryFile.is_open())
-    {
-        cerr << "Error: Unable to open file for reading.\n";
-        return;
-    }
-
-    string description;
-    int quantity, item_id;
-    double price, total_amount = 0.0, cash_received, balance;
-
-    while (true)
-    {
-        cout << "Enter item id (or '0' to finish): ";
-        cin >> item_id;
-
-        if (item_id == 0)
-        {
-            break;
-        }
-
-        bool item_found = false;
-        inventoryFile.clear();
-        inventoryFile.seekg(0);
-
-        string line;
-        while (getline(inventoryFile, line))
-        {
-            stringstream lineStream(line);
-            int id;
-            string tempDescription;
-            double tempPrice;
-
-            lineStream >> id >> tempDescription >> tempPrice;
-
-            if (id == item_id)
-            {
-                item_found = true;
-                description = tempDescription;
-                price = tempPrice;
-
-                cout << "Enter quantity: ";
-                cin >> quantity;
-                cout << "\n";
-                cout << "----------------------------------------\n\n";
-                cout << "Item: " << setw(30) << left << description << endl;
-                cout << "Quantity: " << setw(20) << right << quantity << endl;
-                cout << "Price/Unit: " << setw(20) << right << fixed << setprecision(2) << price << endl;
-
-                double item_total = quantity * price;
-                total_amount += item_total;
-
-                cout << "Total: " << setw(25) << right << fixed << setprecision(2) << item_total << endl;
-                cout << "----------------------------------------\n\n";
-
-                break;
-            }
-        }
-
-        if (!item_found)
-        {
-            cout << "Item not found in inventory." << endl;
-        }
-    }
-
-    inventoryFile.close();
-
-    cout << endl;
-    cout << "\t Total Amount: " << fixed << setprecision(2) << " Rs. " << total_amount << endl << endl;
-
-    cout << "Enter cash received: Rs. ";
-    cin >> cash_received;
-    balance = cash_received - total_amount;
-
-    cout << endl;
-    cout << "Cash Received: " << fixed << setprecision(2) << " Rs. " << cash_received << endl << endl;
-    cout << "Balance: " << fixed << setprecision(2) <<  " Rs. " << balance << endl << endl;
-
-    cout << "Thank You! Have a nice day!" << endl << endl;
-
-    menu();
-
-    dashboard();
-}
-
-struct Item
+// --- Struct Definition ---
+struct Item 
 {
     int id;
-    int quantity;
     string description;
     double selling_price;
     double purchase_price;
+    int quantity;
     double profit;
-    int Quantity;
 };
 
-void inventory()
+void printSeparator() 
 {
-    int n;
+    cout << "+----------+----------------------+---------------+---------------+----------+----------+" << endl;
+}
 
-    cout << "Enter the number of items: ";
-    cin >> n;
-    cout << endl;
+void fileSeparator(ofstream &f) 
+{
+    f << "+----------+----------------------+---------------+---------------+----------+----------+" << endl;
+}
 
-    vector<Item> items(n);
+// --- Function Prototypes ---
+void login();
+void menu();
+void dashboard();
+void owner();
+void cashier();
+void inventory_Save();   
+void inventory_Report(); 
+void inventory_Update(); 
 
-    for (int i = 0; i < n; i++)
+int main() 
+{
+    system("Color F0"); 
+    cout << "----------------- Minsara Book Shop -----------------" << endl << endl;
+    login();
+    return 0;
+}
+
+// --- Login System ---
+void login() 
+{
+    string username = "admin", password = "123", u, p;
+    cout << "Enter the Username: "; 
+    cin >> u;
+
+    cout << "Enter the Password: "; 
+    cin >> p;
+
+    if (u == username && p == password) 
     {
-        cout << "Enter details for item " << i + 1 << ": \n";
-        cout << "Item ID: ";
-        cin >> items[i].id;
-
-        cout << "Description: ";
-        cin.ignore();
-        getline(cin, items[i].description);
-
-        cout << "Selling Price (Rs.): ";
-        cin >> items[i].selling_price;
-
-        cout << "Purchase Price (Rs.): ";
-        cin >> items[i].purchase_price;
-
-        cout << "Quantity: ";
-        cin >> items[i].quantity;
-
-        items[i].profit = items[i].selling_price - items[i].purchase_price;
-
-        cout << "\n";
-    }
-
-    ofstream outputFile("item_data.txt");
-
-    if (outputFile.is_open())
+        cout << "--------------------------Welcome!--------------------------\n" << endl;
+        dashboard();
+    } 
+    else 
     {
-        outputFile << left
-        << setw(10) << "Item ID"
-        << setw(20) << "Description"
-        << setw(20) << "Selling Price(Rs.)"
-        << setw(20) << "Purchase Price(Rs.)"
-        << setw(20) << "Quantity"
-        << setw(20) << "Profit(Rs.)" << endl;
-
-        for (int i = 0; i < n; i++)
-        {
-            outputFile << left
-            << setw(10) << items[i].id
-            << setw(20) << items[i].description
-            << setw(20) << items[i].selling_price
-            << setw(20) << items[i].purchase_price
-            << setw(20) << items[i].quantity
-            << setw(20) << items[i].profit << endl;
-        }
-
-        outputFile.close();
-
-        cout << "Item data written to item_data.txt\n";
-    }
-    else
-    {
-        cerr << "File Was not Found.\n";
+        cout << "Invalid Username or Password." << endl;
     }
 }
 
-void inventory_Report()
-{
-    ifstream inputFile("item_data.txt");
-
-    if (!inputFile.is_open())
-    {
-        cerr << "File Was not Found.\n";
-        return;
-    }
-
-    cout << "* Inventory Report *" << endl;
-
-    string line;
-
-    while (getline(inputFile, line))
-    {
-        cout << line << endl;
-    }
-
-    inputFile.close();
-    menu();
-    dashboard();
-}
-
-void report()
-{
-    fstream outputFile;
-    outputFile.open("item_data.txt", ios::in);
-
-    if (!outputFile.is_open())
-    {
-        cerr << "Error: Unable to open file for reading.\n";
-        return;
-    }
-
-    cout << "Displaying contents of 'item_data.txt':\n";
-    string line;
-
-    while (getline(outputFile, line))
-    {
-        cout << line << endl;
-    }
-
-    outputFile.close();
-}
-
-
-
-void dashboard()
-{
-    char letter;
-    cout << "Enter your logging letter: ";
-    cin >> letter;
-    cout << "\n----------------------------------------------------------" << endl;
-    switch (letter)
-    {
-    case 'O':
-        owner();
-        break;
-
-    case 'C':
-        cashier();
-        break;
-
-    case 'I':
-        inventory();
-        break;
-
-    case 'E':
-        break;
-    }
-}
-
-void menu()
+// --- Menu Design ---
+void menu() 
 {
     cout << "\n---------------------Minsara Book Shop---------------------\n" << endl;
     cout << "1. Owner Dashboard(O)" << endl;
@@ -306,119 +80,314 @@ void menu()
     cout << "\n------------------------------------------------------------\n" << endl;
 }
 
-void login()
+void dashboard() 
 {
-    string username = "admin", password = "temp@123", uname1, pswrd1, ans, pswrd2, pswrd3;
-    for(int i = 0; i < 1; i++)
+    char letter;
+    while (true) 
     {
-        cout << "Enter the Username: ";
-        cin >> uname1;
-        cout << "Enter the Password: ";
-        cin >> pswrd1;
-        if (username == uname1 and password == pswrd1)
+        menu();
+        cout << "Enter your logging letter: ";
+        cin >> letter;
+
+        letter = toupper(letter);
+
+        cout << "\n----------------------------------------------------------" << endl;
+
+        switch (letter) 
         {
-            cout << "--------------------------Welcome!--------------------------\n" << endl;
-
-            menu();
-            dashboard();
-
-            break;
-        }
-        else
-        {
-            cout << "Invalid Username or Password. Try again!" << endl;
-            for(int i = 0; i < 2; i++)
-            {
-                cout << "Enter the Username: ";
-                cin >> uname1;
-                cout << "Enter the Password: ";
-                cin >> pswrd1;
+            case 'O': 
+                owner(); 
                 break;
-            }
-            if (username == uname1 and password == pswrd1)
-            {
-                cout << "--------------------------Welcome!--------------------------\n" << endl;
 
-                menu();
-                dashboard();
-
+            case 'C': 
+                cashier(); 
                 break;
-            }
-            else
-            {
-                 cout << "Invalid Username or Password. Try again!" << endl;
 
-            for(int i = 0; i < 2; i++)
-            {
-                cout << "Enter the Username: ";
-                cin >> uname1;
-                cout << "Enter the Password: ";
-                cin >> pswrd1;
+            case 'I': 
+                inventory_Save(); 
                 break;
-            }
-            if (username == uname1 and password == pswrd1)
-            {
-                cout << "--------------------------Welcome!--------------------------\n" << endl;
 
-                menu();
-                dashboard();
+            case 'E': 
+                exit(0);
 
-                break;
-            }
-            else
-            {
-                cout << "Forget your Password? " << endl;
-                cout << "Enter \"Yes\" or \"No\": ";
-                cin >> ans;
-                if(ans == "Yes")
-                {
-                    cout << "Enter your Username: ";
-                    cin >> uname1;
-                    if(uname1 == username)
-                    {
-                        cout << "Enter your New Password: ";
-                        cin >> pswrd2;
-                        cout << "Confirm your Password: ";
-                        cin >> pswrd3;
-                        if(pswrd2 == pswrd3)
-                        {
-                            cout << "Password changed successfully!\n" << endl;
-                            cout << "---------------------------------------------\n" << endl;
-                            menu();
-                            dashboard();
-                            break;
-                        }
-                        else
-                        {
-                            cout << "Password doesn't matched! " << endl;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        cout << "ERROR!" << endl;
-                        cout << "You cannot logging to the system!" << endl;
-                        break;
-                    }
-                }
-                else
-                {
-                    cout << "You cannot logging because you\'ve failed 3 times. Please contact owner of the shop!" << endl;
-                }
-            }
-            }
+            default: 
+                cout << "Invalid Selection." << endl;
         }
     }
 }
 
-int main()
+// --- 1. SAVE: Creating visual tables in text.txt ---
+void inventory_Save() {
+    int n;
+    cout << "Enter the number of items: ";
+    cin >> n;
+
+    // Check if file is empty to write header
+    ifstream checkFile("text.txt");
+    bool isEmpty = (checkFile.peek() == ifstream::traits_type::eof());
+    checkFile.close();
+
+    ofstream outputFile("text.txt", ios::app);
+
+    if (outputFile.is_open()) 
+    {
+        if (isEmpty) 
+        {
+            fileSeparator(outputFile);
+
+            outputFile << "| " << left << setw(8) << "ID" 
+                       << "| " << setw(20) << "Description" 
+                       << "| " << setw(13) << "Selling(Rs)" 
+                       << "| " << setw(13) << "Purchase(Rs)" 
+                       << "| " << setw(8) << "Qty" 
+                       << "| " << setw(8) << "Profit" << " |" << endl;
+            fileSeparator(outputFile);
+        }
+
+        for (int i = 0; i < n; i++) 
+        {
+            Item itm;
+            cout << "\n--- Item " << i + 1 << " ---" << endl;
+            cout << "Item ID: "; 
+            cin >> itm.id;
+
+            cout << "Description: "; 
+            cin.ignore(); 
+            getline(cin, itm.description);
+
+            cout << "Selling Price: "; 
+            cin >> itm.selling_price;
+
+            cout << "Purchase Price: "; 
+            cin >> itm.purchase_price;
+
+            cout << "Quantity: "; 
+            cin >> itm.quantity;
+            
+            itm.profit = itm.selling_price - itm.purchase_price;
+
+            outputFile << "| " << left << setw(8) << itm.id 
+                       << "| " << setw(20) << (itm.description.substr(0, 20)) 
+                       << "| " << setw(13) << fixed << setprecision(2) << itm.selling_price 
+                       << "| " << setw(13) << itm.purchase_price 
+                       << "| " << setw(8) << itm.quantity 
+                       << "| " << setw(8) << itm.profit << " |" << endl;
+            fileSeparator(outputFile);
+        }
+        outputFile.close();
+
+        cout << "\nData saved successfully with borders.\n";
+    }
+}
+
+// --- 2. GET: Reading data from the visual table ---
+void inventory_Report() 
 {
-    //Welcome
+    ifstream inputFile("text.txt");
+    string line;
+    if (!inputFile.is_open()) 
+    {
+        cout << "File Not Found." << endl;
+        return;
+    }
+    
+    cout << "\n--- Current Inventory Table (from text.txt) ---\n" << endl;
+    
+    while (getline(inputFile, line)) 
+    {
+        cout << line << endl;
+    }
+    inputFile.close();
+}
 
-    system("Color F0"); //Background color
+// --- 3. UPDATE: Updating data within the table ---
+void inventory_Update() 
+{
+    int targetId;
+    cout << "Enter Item ID to edit: ";
+    cin >> targetId;
 
-    cout << "-----------------Minsara Book Shop-----------------" << endl << endl;
+    ifstream inputFile("text.txt");
+    if (!inputFile) 
+    { 
+        cout << "Error opening file!"; 
+        return; 
+    }
 
-    login();
-    return 0;
+    vector<string> fileLines;
+    string line;
+    bool found = false;
+
+    while (getline(inputFile, line)) 
+    {
+        // Look for the ID inside the table row (ignoring separator lines)
+        if (line[0] == '|') 
+        {
+            stringstream ss(line.substr(1, 10)); // Extract ID section
+            int currentId;
+            if (ss >> currentId && currentId == targetId) 
+            {
+                found = true;
+                Item itm;
+                itm.id = currentId;
+
+                cout << "Record Found! Enter New Details:" << endl;
+
+                cout << "New Description: "; 
+                cin.ignore(); 
+                getline(cin, itm.description);
+
+                cout << "New Selling Price: "; 
+                cin >> itm.selling_price;
+
+                cout << "New Purchase Price: "; 
+                cin >> itm.purchase_price;
+
+                cout << "New Quantity: "; 
+                cin >> itm.quantity;
+
+                itm.profit = itm.selling_price - itm.purchase_price;
+
+                // Re-construct the specific row string
+                stringstream updatedLine;
+                updatedLine << "| " << left << setw(8) << itm.id 
+                            << "| " << setw(20) << (itm.description.substr(0, 20)) 
+                            << "| " << setw(13) << fixed << setprecision(2) << itm.selling_price 
+                            << "| " << setw(13) << itm.purchase_price 
+                            << "| " << setw(8) << itm.quantity 
+                            << "| " << setw(8) << itm.profit << " |";
+                fileLines.push_back(updatedLine.str());
+                continue;
+            }
+        }
+        fileLines.push_back(line);
+    }
+    inputFile.close();
+
+    if (found) 
+    {
+        ofstream outputFile("text.txt");
+        for (const string& l : fileLines) outputFile << l << endl;
+        outputFile.close();
+        cout << "Item ID " << targetId << " has been edited successfully." << endl;
+    } 
+    else 
+    {
+        cout << "Item ID not found." << endl;
+    }
+}
+
+void owner() 
+{
+    int num;
+    cout << "\n1. Inventory Report\n2. Update Item\n3. Back\nChoice: ";
+    cin >> num;
+    if (num == 1) inventory_Report();
+    else if (num == 2) inventory_Update();
+}
+
+void cashier()
+{
+    int invo_num;
+    string user_name;
+    cout << "                            INVOICE                               \n" << endl;
+    cout << "------------------------Minsara Book Shop------------------------\n" << endl;
+    cout << "                       #134, Colombo Road                         " << endl;
+    cout << "                            Negombo                               " << endl;
+    cout << "                         Tel: 0317362833                          " << endl;
+    
+    time_t tt;
+    struct tm * ti;
+    time(&tt);
+    ti = localtime(&tt);
+    cout << "Date and Time: \t" << asctime(ti); // asctime adds a newline
+    
+    cout << "Invoice No: ";
+    cin >> invo_num;
+    cout << "User: ";
+    cin >> user_name;
+    cout << endl;
+
+    double total_amount = 0.0;
+
+    while (true)
+    {
+        int search_id;
+        cout << "Enter item id (or '0' to finish): ";
+        cin >> search_id;
+
+        if (search_id == 0) break;
+
+        ifstream inventoryFile("text.txt");
+        if (!inventoryFile.is_open()) 
+        {
+            cerr << "Error: Unable to open inventory file.\n";
+            return;
+        }
+
+        string line;
+        bool item_found = false;
+
+        while (getline(inventoryFile, line))
+        {
+            // Only process lines that look like table data rows
+            if (line.length() > 10 && line[0] == '|') 
+            {
+                // Extract the ID part (first column)
+                stringstream ssId(line.substr(2, 8)); 
+                int currentId;
+                
+                if (ssId >> currentId && currentId == search_id)
+                {
+                    item_found = true;
+                    
+                    // Extract Description (Column 2) and Price (Column 3)
+                    // Based on your setw() in inventory_Save:
+                    // ID starts at 2, Desc starts at 12, Price starts at 34
+                    string description = line.substr(12, 20);
+                    // Trim trailing spaces from description
+                    description.erase(description.find_last_not_of(" \n\r\t")+1);
+
+                    stringstream ssPrice(line.substr(34, 13));
+                    double price;
+                    ssPrice >> price;
+
+                    int quantity;
+                    cout << "Item: " << description << " (Rs. " << fixed << setprecision(2) << price << ")" << endl;
+                    cout << "Enter quantity: ";
+                    cin >> quantity;
+
+                    double item_total = quantity * price;
+                    total_amount += item_total;
+
+                    cout << "\n----------------------------------------\n";
+                    cout << left << setw(20) << "Item" << ": " << description << endl;
+                    cout << left << setw(20) << "Qty" << ": " << quantity << endl;
+                    cout << left << setw(20) << "Total" << ": Rs. " << item_total << endl;
+                    cout << "----------------------------------------\n\n";
+                    break; 
+                }
+            }
+        }
+        inventoryFile.close();
+
+        if (!item_found)
+        {
+            cout << "Item [" << search_id << "] not found in inventory.\n" << endl;
+        }
+    }
+
+    // Final calculations
+    cout << "\n" << string(40, '=') << endl;
+    cout << "TOTAL AMOUNT: Rs. " << fixed << setprecision(2) << total_amount << endl;
+    cout << string(40, '=') << endl;
+
+    if (total_amount > 0) {
+        double cash_received;
+        cout << "Enter cash received: Rs. ";
+        cin >> cash_received;
+        cout << "Balance: Rs. " << (cash_received - total_amount) << endl;
+    }
+
+    cout << "\nThank You! Have a nice day!\n" << endl;
 }
