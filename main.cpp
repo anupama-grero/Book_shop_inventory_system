@@ -270,14 +270,12 @@ void inventory_Report()
 {
     ifstream inputFile("text.txt");
     string line;
-    if (!inputFile.is_open()) 
+    if (!inputFile) 
     {
-        cout << "File Not Found." << endl;
+        cout << "No inventory records found." << endl;
         return;
     }
-    
-    cout << "\n--- Current Inventory Table (from text.txt) ---\n" << endl;
-    
+    cout << "\n--- Inventory Report ---\n";
     while (getline(inputFile, line)) 
     {
         cout << line << endl;
