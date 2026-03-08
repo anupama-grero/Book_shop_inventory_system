@@ -49,23 +49,108 @@ int main()
 }
 
 // --- Login System ---
-void login() 
+void login()
 {
-    string username = "admin", password = "123", u, p;
-    cout << "Enter the Username: "; 
-    cin >> u;
-
-    cout << "Enter the Password: "; 
-    cin >> p;
-
-    if (u == username && p == password) 
+    string username = "admin", password = "temp@123", uname1, pswrd1, ans, pswrd2, pswrd3;
+    for(int i = 0; i < 1; i++)
     {
-        cout << "--------------------------Welcome!--------------------------\n" << endl;
-        dashboard();
-    } 
-    else 
-    {
-        cout << "Invalid Username or Password." << endl;
+        cout << "Enter the Username: ";
+        cin >> uname1;
+        cout << "Enter the Password: ";
+        cin >> pswrd1;
+        if (username == uname1 and password == pswrd1)
+        {
+            cout << "--------------------------Welcome!--------------------------\n" << endl;
+
+            menu();
+            dashboard();
+
+            break;
+        }
+        else
+        {
+            cout << "Invalid Username or Password. Try again!" << endl;
+            for(int i = 0; i < 2; i++)
+            {
+                cout << "Enter the Username: ";
+                cin >> uname1;
+                cout << "Enter the Password: ";
+                cin >> pswrd1;
+                break;
+            }
+            if (username == uname1 and password == pswrd1)
+            {
+                cout << "--------------------------Welcome!--------------------------\n" << endl;
+
+                menu();
+                dashboard();
+
+                break;
+            }
+            else
+            {
+                 cout << "Invalid Username or Password. Try again!" << endl;
+
+            for(int i = 0; i < 2; i++)
+            {
+                cout << "Enter the Username: ";
+                cin >> uname1;
+                cout << "Enter the Password: ";
+                cin >> pswrd1;
+                break;
+            }
+            if (username == uname1 and password == pswrd1)
+            {
+                cout << "--------------------------Welcome!--------------------------\n" << endl;
+
+                menu();
+                dashboard();
+
+                break;
+            }
+            else
+            {
+                cout << "Forget your Password? " << endl;
+                cout << "Enter \"Yes\" or \"No\": ";
+                cin >> ans;
+                if(ans == "Yes")
+                {
+                    cout << "Enter your Username: ";
+                    cin >> uname1;
+                    if(uname1 == username)
+                    {
+                        cout << "Enter your New Password: ";
+                        cin >> pswrd2;
+                        cout << "Confirm your Password: ";
+                        cin >> pswrd3;
+                        if(pswrd2 == pswrd3)
+                        {
+                            cout << "Password changed successfully!\n" << endl;
+                            cout << "---------------------------------------------\n" << endl;
+                            menu();
+                            dashboard();
+                            break;
+                        }
+                        else
+                        {
+                            cout << "Password doesn't matched! " << endl;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        cout << "ERROR!" << endl;
+                        cout << "You cannot logging to the system!" << endl;
+                        break;
+                    }
+                }
+                else
+                {
+                    cout << "You cannot logging because you\'ve failed 3 times. Please contact owner of the shop!" << endl;
+                }
+            }
+            }
+        }
     }
 }
 
